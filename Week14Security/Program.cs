@@ -35,7 +35,6 @@ namespace Week14Security
                     Scheme = "Bearer" 
                 });
 
-                //make sure the JWT token is sent with every call
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement()
                 {
                     {
