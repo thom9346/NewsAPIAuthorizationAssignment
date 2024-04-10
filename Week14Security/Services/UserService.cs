@@ -11,10 +11,13 @@ namespace Week14Security.Services
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IUserRepository _userRepository;
-        public UserService(IHttpContextAccessor httpContextAccessor, IUserRepository userRepository)
+        private readonly IConfiguration _configuration;
+
+        public UserService(IHttpContextAccessor httpContextAccessor, IUserRepository userRepository, IConfiguration configuration)
         {
             _httpContextAccessor = httpContextAccessor;
             _userRepository = userRepository;
+            _configuration = configuration;
         }
         public int GetCurrentUserId()
         {
@@ -38,7 +41,15 @@ namespace Week14Security.Services
             var role = _userRepository.GetUserRole(user.UserId);
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes("ThisIsASuperSecretKeyThatIsLongEnough");
+
+            var jwtKey = _configuration.GetValue<string>("Jwt:Key");
+            if (string.IsNullOrEmpty(jwtKey))
+            {
+                throw new InvalidOperationException("JWT signing key is not set in configuration.");
+            }
+
+            var key = Encoding.ASCII.GetBytes(jwtKey);
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[]

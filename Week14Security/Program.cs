@@ -54,6 +54,14 @@ namespace Week14Security
                 });
             });
 
+            builder.Configuration.AddJsonFile("secrets.json", optional: true, reloadOnChange: true);
+            var jwtKey = builder.Configuration.GetValue<string>("Jwt:Key");
+
+            if (string.IsNullOrEmpty(jwtKey))
+            {
+                throw new InvalidOperationException("JWT signing key is not set in configuration.");
+            }
+
 
             builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite("Data Source=newsSite.db"));
             builder.Services.AddTransient<IDbInitializer, DbInitializer>();
@@ -66,7 +74,7 @@ namespace Week14Security
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("ThisIsASuperSecretKeyThatIsLongEnough")),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtKey)),
                     ValidateIssuer = false,
                     ValidateAudience = false
                 };
