@@ -55,17 +55,8 @@ namespace Week14Security.Controllers
             return new ObjectResult(articleDto);
         }
         [HttpGet]
-        public IEnumerable<ArticleDTO> GetAll()
-        {
-            var articleDtoList = new List<ArticleDTO>();
+        public IEnumerable<ArticleDTO> GetAll() => _articlesRepository.GetAll().Select(_converter.Convert);
 
-            foreach (var article in _articlesRepository.GetAll())
-            {
-                var articleDto = _converter.Convert(article);
-                articleDtoList.Add(articleDto);
-            }
-            return articleDtoList;
-        }
 
         [Authorize(Policy = "RequireEditorRole")]
         [HttpPut("{id}")]

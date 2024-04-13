@@ -51,19 +51,24 @@ namespace Week14Security.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateUser([FromBody] UserDTO userDTO)
+        public IActionResult CreateUser([FromBody] UserCreationDTO userCreationDto)
         {
-            if (userDTO == null)
+            if (userCreationDto == null)
             {
                 return BadRequest();
             }
 
-            var user = _converter.Convert(userDTO);
-            user.PasswordHash = PasswordHasher.HashPassword(user.PasswordHash);
+            User user = new User
+            {
+                Username = userCreationDto.Username,
+                Role = userCreationDto.Role,
+                PasswordHash = PasswordHasher.HashPassword(userCreationDto.Password)
+            };
 
             var newUser = _userRepository.Add(user);
+            var userDto = _converter.Convert(newUser);
 
-            return CreatedAtRoute("GetUser", new { id = newUser.UserId }, _converter.Convert(newUser));
+            return CreatedAtRoute("GetUser", new { id = newUser.UserId }, userDto);
         }
 
         [HttpGet("{id}", Name = "GetUser")]
@@ -79,17 +84,7 @@ namespace Week14Security.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<UserDTO> GetAll()
-        {
-            var userDtoList = new List<UserDTO>();
-
-            foreach (var user in _userRepository.GetAll())
-            {
-                var userDto = _converter.Convert(user);
-                userDtoList.Add(userDto);
-            }
-            return userDtoList;
-        }
+        public IEnumerable<UserDTO> GetAll() => _userRepository.GetAll().Select(_converter.Convert);
 
     }
 }

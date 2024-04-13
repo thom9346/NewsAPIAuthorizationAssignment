@@ -8,7 +8,6 @@
             {
                 UserId = model.UserId,
                 Username = model.Username,
-                PasswordHash = model.PasswordHash,
                 Role = model.Role,
             };
         }
@@ -19,7 +18,6 @@
             {
                 UserId = model.UserId,
                 Username = model.Username,
-                PasswordHash = model.PasswordHash,
                 Role = model.Role,
             };
         }
